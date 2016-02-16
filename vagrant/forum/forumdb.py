@@ -7,6 +7,7 @@ import time
 ## Database connection
 DB = []
 
+
 ## Get posts from database.
 def GetAllPosts():
     '''Get all the posts from the database, sorted with the newest first.
@@ -19,6 +20,7 @@ def GetAllPosts():
     posts = [{'content': str(row[1]), 'time': str(row[0])} for row in DB]
     posts.sort(key=lambda row: row['time'], reverse=True)
     return posts
+
 
 ## Add a post to the database.
 def AddPost(content):
