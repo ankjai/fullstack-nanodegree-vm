@@ -2,6 +2,7 @@
 # Database access functions for the web forum.
 # 
 
+import bleach
 import psycopg2
 
 ## Database connection
@@ -50,6 +51,10 @@ def AddPost(content):
 
     # insert statement
     sql = "INSERT INTO posts(content) VALUES(%s);"
+
+    # use bleach to
+    # escapes or strips markup and attributes
+    content = bleach.clean(content)
 
     # exe insert statement
     # use tuple to avoid db injection issues
