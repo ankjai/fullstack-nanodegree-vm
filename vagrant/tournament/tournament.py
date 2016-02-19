@@ -13,14 +13,34 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
+    # sql statement
+    sql = "DELETE FROM game;"
+
+    # execute sql
+    exeSql(sql)
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
+    # sql statement
+    sql = "DELETE FROM player;"
+
+    # execute sql
+    exeSql(sql)
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    # sql statement
+    sql = "SELECT COUNT(*) FROM player;"
+
+    # execute sql
+    # result = exeSql(sql)
+
+    return int(exeSql(sql)[0][0])
+
+    # for row in result:
+    #     print str(row[0])
 
 
 def registerPlayer(name):
@@ -73,3 +93,36 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+
+
+def exeSql(sql):
+    print "EXE SQL"
+
+    # db conn object
+    conn = connect()
+
+    # Open a cursor to perform database operations
+    cur = conn.cursor()
+
+    # execute delete
+    cur.execute(sql)
+
+    print ("rowcount", cur.rowcount)
+    print ("rownumber", cur.rownumber)
+    print ("statusmessage", cur.statusmessage)
+
+    # declare resultSet
+    resultSet = ()
+
+    # when
+    if "SELECT" in cur.statusmessage:
+        resultSet = cur.fetchall()
+
+    # make the changes to the db persistent
+    conn.commit()
+
+    # Close communication with the database
+    cur.close()
+    conn.close()
+
+    return resultSet
