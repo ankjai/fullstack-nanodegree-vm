@@ -3,12 +3,13 @@
 # tournament.py -- implementation of a Swiss-system tournament
 #
 
+import bleach
 import psycopg2
 
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+    return psycopg2.connect("dbname=tournamentproj")
 
 
 def deleteMatches():
@@ -17,7 +18,7 @@ def deleteMatches():
     sql = "DELETE FROM game;"
 
     # execute sql
-    exeSql(sql)
+    exe_sql_with_comments(sql, None)
 
 
 def deletePlayers():
@@ -26,7 +27,7 @@ def deletePlayers():
     sql = "DELETE FROM player;"
 
     # execute sql
-    exeSql(sql)
+    exe_sql_with_comments(sql, None)
 
 
 def countPlayers():
@@ -34,16 +35,30 @@ def countPlayers():
     # sql statement
     sql = "SELECT COUNT(*) FROM player;"
 
+    return int(exe_sql_with_comments(sql, None)[0][0])
+
+
+def createTournament(tournament_name):
+    """
+    Args:
+        tournament_name: the tournament name in which player will register
+         and matches will be played.
+
+    Returns:
+        NONE
+    """
+    # sql statement
+    sql = "INSERT INTO tournament(tournament_name) VALUES(%(tournament_name)s);"
+
+    # use bleach to
+    # escapes or strips markup and attributes
+    tournament_name = bleach.clean(tournament_name)
+
     # execute sql
-    # result = exeSql(sql)
-
-    return int(exeSql(sql)[0][0])
-
-    # for row in result:
-    #     print str(row[0])
+    exe_sql_with_comments(sql, {'tournament_name': tournament_name})
 
 
-def registerPlayer(name):
+def registerPlayer(tournament_name, player_name):
     """Adds a player to the tournament database.
   
     The database assigns a unique serial id number for the player.  (This
@@ -52,6 +67,25 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    # sql statement
+    sql = "SELECT tournament_id FROM tournament WHERE tournament_name=%(tournament_name)s;"
+
+    # use bleach to
+    # escapes or strips markup and attributes
+    tournament_name = bleach.clean(tournament_name)
+
+    # execute sql to get tournament_id
+    tournament_id = int(exe_sql_with_comments(sql, {'tournament_name': tournament_name})[0][0])
+
+    # use bleach to
+    # escapes or strips markup and attributes
+    player_name = bleach.clean(player_name)
+
+    # sql statement
+    sql = "INSERT INTO player(tournament_id, player_name) VALUES(%(tournament_id)s, %(player_name)s);"
+
+    # execute sql
+    exe_sql_with_comments(sql, {'tournament_id': tournament_id, 'player_name': player_name})
 
 
 def playerStandings():
@@ -95,9 +129,7 @@ def swissPairings():
     """
 
 
-def exeSql(sql):
-    print "EXE SQL"
-
+def exe_sql_with_comments(sql, dict_):
     # db conn object
     conn = connect()
 
@@ -105,16 +137,15 @@ def exeSql(sql):
     cur = conn.cursor()
 
     # execute delete
-    cur.execute(sql)
-
-    print ("rowcount", cur.rowcount)
-    print ("rownumber", cur.rownumber)
-    print ("statusmessage", cur.statusmessage)
+    if dict_ is None:
+        cur.execute(sql)
+    else:
+        cur.execute(sql, dict_)
 
     # declare resultSet
     resultSet = ()
 
-    # when
+    # fetch results only for select stmns.
     if "SELECT" in cur.statusmessage:
         resultSet = cur.fetchall()
 
