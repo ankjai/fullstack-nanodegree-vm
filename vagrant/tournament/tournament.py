@@ -18,7 +18,7 @@ def deleteMatches():
     sql = "DELETE FROM game;"
 
     # execute sql
-    exe_sql_with_comments(sql, None)
+    exeSql(sql, None)
 
 
 def deletePlayers():
@@ -27,7 +27,7 @@ def deletePlayers():
     sql = "DELETE FROM player;"
 
     # execute sql
-    exe_sql_with_comments(sql, None)
+    exeSql(sql, None)
 
 
 def countPlayers():
@@ -35,7 +35,7 @@ def countPlayers():
     # sql statement
     sql = "SELECT COUNT(*) FROM player;"
 
-    return int(exe_sql_with_comments(sql, None)[0][0])
+    return int(exeSql(sql, None)[0][0])
 
 
 def createTournament(tournament_name):
@@ -55,7 +55,7 @@ def createTournament(tournament_name):
     tournament_name = bleach.clean(tournament_name)
 
     # execute sql
-    exe_sql_with_comments(sql, {'tournament_name': tournament_name})
+    exeSql(sql, {'tournament_name': tournament_name})
 
 
 def registerPlayer(tournament_name, player_name):
@@ -75,7 +75,7 @@ def registerPlayer(tournament_name, player_name):
     tournament_name = bleach.clean(tournament_name)
 
     # execute sql to get tournament_id
-    tournament_id = int(exe_sql_with_comments(sql, {'tournament_name': tournament_name})[0][0])
+    tournament_id = int(exeSql(sql, {'tournament_name': tournament_name})[0][0])
 
     # use bleach to
     # escapes or strips markup and attributes
@@ -85,7 +85,7 @@ def registerPlayer(tournament_name, player_name):
     sql = "INSERT INTO player(tournament_id, player_name) VALUES(%(tournament_id)s, %(player_name)s);"
 
     # execute sql
-    exe_sql_with_comments(sql, {'tournament_id': tournament_id, 'player_name': player_name})
+    exeSql(sql, {'tournament_id': tournament_id, 'player_name': player_name})
 
 
 def playerStandings():
@@ -129,7 +129,7 @@ def swissPairings():
     """
 
 
-def exe_sql_with_comments(sql, dict_):
+def exeSql(sql, dict_):
     # db conn object
     conn = connect()
 
