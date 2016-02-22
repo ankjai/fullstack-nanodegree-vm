@@ -12,6 +12,15 @@ def connect():
     return psycopg2.connect("dbname=tournamentproj")
 
 
+def deleteTournaments():
+    """Remove a tournament from the database."""
+    # sql statement
+    sql = "DELETE FROM tournament;"
+
+    # execute sql
+    exeSql(sql, None)
+
+
 def deleteMatches():
     """Remove all the match records from the database."""
     # sql statement
