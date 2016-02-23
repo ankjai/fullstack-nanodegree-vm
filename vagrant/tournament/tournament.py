@@ -97,7 +97,7 @@ def registerPlayer(tournament_name, player_name):
     exeSql(sql, {'tournament_id': tournament_id, 'player_name': player_name})
 
 
-def playerStandings():
+def playerStandings(tournament_name):
     """Returns a list of the players and their win records, sorted by wins.
 
     The first entry in the list should be the player in first place, or a player
@@ -110,6 +110,7 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    sql = "SELECT * FROM standing ORDER BY player_win_count DESC"
 
 
 def reportMatch(winner, loser):
@@ -121,7 +122,7 @@ def reportMatch(winner, loser):
     """
 
 
-def swissPairings():
+def swissPairings(tournament_name):
     """Returns a list of pairs of players for the next round of a match.
   
     Assuming that there are an even number of players registered, each player

@@ -25,7 +25,7 @@ def testCount():
     if c != 0:
         raise ValueError("After deletion, countPlayers should return zero.")
     print "1. countPlayers() returns 0 after initial deletePlayers() execution."
-    tournament_name = "Chess Tournament"
+    tournament_name = "Chess Knockout Tournament"
     createTournament(tournament_name)
     registerPlayer(tournament_name, "Chandra Nalaar")
     c = countPlayers()
@@ -54,8 +54,11 @@ def testStandingsBeforeMatches():
     """
     deleteMatches()
     deletePlayers()
-    registerPlayer("Melpomene Murray")
-    registerPlayer("Randy Schwartz")
+    deleteTournaments()
+    tournament_name = "Cricket Tournament"
+    createTournament(tournament_name)
+    registerPlayer(tournament_name, "Melpomene Murray")
+    registerPlayer(tournament_name, "Randy Schwartz")
     standings = playerStandings()
     if len(standings) < 2:
         raise ValueError("Players should appear in playerStandings even before "
