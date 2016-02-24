@@ -82,11 +82,13 @@ $trig_update_standing$ LANGUAGE plpgsql;
 
 -- CREATE TRIGGERS
 -- trig_insert_standing
+DROP TRIGGER IF EXISTS trig_insert_standing ON player;
 CREATE TRIGGER trig_insert_standing
 AFTER INSERT ON player
 FOR EACH ROW EXECUTE PROCEDURE func_insert_standing();
 
 -- trig_update_standing
+DROP TRIGGER IF EXISTS trig_update_standing ON outcome;
 CREATE TRIGGER trig_update_standing
 AFTER INSERT ON outcome
 FOR EACH ROW EXECUTE PROCEDURE func_update_standing();
