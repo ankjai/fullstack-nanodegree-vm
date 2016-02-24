@@ -15,6 +15,8 @@ def testCount():
              player count after 1 and 2 players registered,
              player count after players deleted.
     """
+    deleteStanding()
+    deleteOutcome()
     deleteMatches()
     deletePlayers()
     deleteTournaments()
@@ -52,6 +54,8 @@ def testStandingsBeforeMatches():
     Test to ensure players are properly represented in standings prior
     to any matches being reported.
     """
+    deleteStanding()
+    deleteOutcome()
     deleteMatches()
     deletePlayers()
     deleteTournaments()
@@ -59,7 +63,7 @@ def testStandingsBeforeMatches():
     createTournament(tournament_name)
     registerPlayer(tournament_name, "Melpomene Murray")
     registerPlayer(tournament_name, "Randy Schwartz")
-    standings = playerStandings()
+    standings = playerStandings(tournament_name)
     if len(standings) < 2:
         raise ValueError("Players should appear in playerStandings even before "
                          "they have played any matches.")
@@ -82,17 +86,22 @@ def testReportMatches():
     Test that matches are reported properly.
     Test to confirm matches are deleted properly.
     """
+    deleteStanding()
+    deleteOutcome()
     deleteMatches()
     deletePlayers()
-    registerPlayer("Bruno Walton")
-    registerPlayer("Boots O'Neal")
-    registerPlayer("Cathy Burton")
-    registerPlayer("Diane Grant")
-    standings = playerStandings()
+    deleteTournaments()
+    tournament_name = "Baseball Tournament"
+    createTournament(tournament_name)
+    registerPlayer(tournament_name, "Bruno Walton")
+    registerPlayer(tournament_name, "Boots O'Neal")
+    registerPlayer(tournament_name, "Cathy Burton")
+    registerPlayer(tournament_name, "Diane Grant")
+    standings = playerStandings(tournament_name)
     [id1, id2, id3, id4] = [row[0] for row in standings]
-    reportMatch(id1, id2)
-    reportMatch(id3, id4)
-    standings = playerStandings()
+    reportMatchByPlayerIDs(id1, id2)
+    reportMatchByPlayerIDs(id3, id4)
+    standings = playerStandings(tournament_name)
     for (i, n, w, m) in standings:
         if m != 1:
             raise ValueError("Each player should have one match recorded.")
@@ -133,10 +142,10 @@ def testPairings():
     if len(pairings) != 4:
         raise ValueError(
             "For eight players, swissPairings should return 4 pairs. Got {pairs}".format(pairs=len(pairings)))
-    reportMatch(id1, id2)
-    reportMatch(id3, id4)
-    reportMatch(id5, id6)
-    reportMatch(id7, id8)
+    reportMatchByPlayerIDs(id1, id2)
+    reportMatchByPlayerIDs(id3, id4)
+    reportMatchByPlayerIDs(id5, id6)
+    reportMatchByPlayerIDs(id7, id8)
     pairings = swissPairings()
     if len(pairings) != 4:
         raise ValueError(
