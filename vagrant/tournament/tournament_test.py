@@ -99,6 +99,8 @@ def testReportMatches():
     registerPlayer(tournament_name, "Diane Grant")
     standings = playerStandings(tournament_name)
     [id1, id2, id3, id4] = [row[0] for row in standings]
+    createMatchesByPlayerIDs(id1, id2)
+    createMatchesByPlayerIDs(id3, id4)
     reportMatchByPlayerIDs(id1, id2)
     reportMatchByPlayerIDs(id3, id4)
     standings = playerStandings(tournament_name)

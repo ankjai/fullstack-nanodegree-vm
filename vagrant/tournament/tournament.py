@@ -131,23 +131,45 @@ def playerStandings(tournament_name):
     return exeSql(sql, {'tournament_name': tournament_name})
 
 
-def createMatches(first_player, second_player):
-    sql = "select * from player where player_name=%(player_name)s;"
-    result = exeSql(sql, {'player_name': first_player})
-    for first_player_id, first_player_tournament_id, first_player_name in result:
-        print "ID:", first_player_id, "TID:", first_player_tournament_id, "NAME:", first_player_name
+def createMatchesByPlayerNames(first_player_name, second_player_name):
+    # create query
+    sql = "SELECT player_id, tournament_id " \
+          "FROM player " \
+          "WHERE player_name=%(player_name)s;"
 
-    result = exeSql(sql, {'player_name': second_player})
-    for second_player_id, second_player_tournament_id, second_player_name in result:
-        print "ID:", second_player_id, "TID:", second_player_tournament_id, "NAME:", second_player_name
+    # exe for first player
+    [(first_player_id, first_player_tournament_id)] = exeSql(sql, {'player_name': first_player_name})
 
-    print "IDs:", first_player_id, second_player_id
+    # exe for second player
+    [(second_player_id, second_player_tournament_id)] = exeSql(sql, {'player_name': second_player_name})
 
-    sql = "INSERT INTO game(tournament_id, first_player_id, second_player_id) VALUES(%(first_player_tournament_id)s, %(first_player_id)s, %(second_player_id)s);"
+    createMatches(first_player_tournament_id, second_player_tournament_id, first_player_id, second_player_id)
 
-    if (first_player_tournament_id == second_player_tournament_id):
-        print "Players are of same tournament"
-        exeSql(sql, {'first_player_tournament_id': first_player_tournament_id, 'first_player_id': first_player_id,
+
+def createMatchesByPlayerIDs(first_player_id, second_player_id):
+    # create query
+    sql = "SELECT tournament_id " \
+          "FROM player " \
+          "WHERE player_id=%(player_id)s;"
+
+    # exe for first player
+    [(first_player_tournament_id)] = exeSql(sql, {'player_id': first_player_id})
+
+    # exe for second player
+    [(second_player_tournament_id)] = exeSql(sql, {'player_id': second_player_id})
+
+    createMatches(first_player_tournament_id, second_player_tournament_id, first_player_id, second_player_id)
+
+
+def createMatches(first_player_tournament_id, second_player_tournament_id, first_player_id, second_player_id):
+    # create query
+    sql = "INSERT INTO game(tournament_id, first_player_id, second_player_id) " \
+          "VALUES(%(tournament_id)s, %(first_player_id)s, %(second_player_id)s);"
+
+    # verify
+    if first_player_tournament_id == second_player_tournament_id:
+        # exe query
+        exeSql(sql, {'tournament_id': first_player_tournament_id, 'first_player_id': first_player_id,
                      'second_player_id': second_player_id})
     else:
         raise AssertionError("Players are not of same tournament.")
@@ -191,8 +213,6 @@ def reportMatchByPlayerIDs(winner_id, loser_id):
           "FROM game " \
           "WHERE (first_player_id=%(winner_id)s AND second_player_id=%(loser_id)s) " \
           "OR (first_player_id=%(loser_id)s AND second_player_id=%(winner_id)s);"
-
-    print sql, winner_id, loser_id
 
     # exe for game_id
     [(game_id,)] = exeSql(sql, {'winner_id': winner_id, 'loser_id': loser_id})
