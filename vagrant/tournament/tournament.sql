@@ -78,6 +78,18 @@ BEGIN
 END;
 $trig_update_standing$ LANGUAGE plpgsql;
 
+-- func_reset_standing
+CREATE OR REPLACE FUNCTION func_reset_standing() RETURNS TRIGGER AS $trig_reset_standing$
+BEGIN
+    IF (TG_OP = 'DELETE') THEN
+        UPDATE standing
+            SET player_win_count = 0, player_game_count = 0
+        WHERE player_id = OLD.first_player_id OR player_id = OLD.second_player_id;
+        RETURN NEW;
+    END IF;
+END;
+$trig_reset_standing$ LANGUAGE plpgsql;
+
 
 
 -- CREATE TRIGGERS
@@ -92,6 +104,12 @@ DROP TRIGGER IF EXISTS trig_update_standing ON outcome;
 CREATE TRIGGER trig_update_standing
 AFTER INSERT ON outcome
 FOR EACH ROW EXECUTE PROCEDURE func_update_standing();
+
+-- trig_update_standing
+DROP TRIGGER IF EXISTS trig_reset_standing ON game;
+CREATE TRIGGER trig_reset_standing
+AFTER DELETE ON game
+FOR EACH ROW EXECUTE PROCEDURE func_reset_standing();
 
 
 -- CREATE VIEWS
