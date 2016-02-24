@@ -7,11 +7,11 @@
 -- these lines here.
 
 -- cleanUp
-DROP TABLE standing;
-DROP TABLE outcome;
-DROP TABLE game;
-DROP TABLE player;
-DROP TABLE tournament;
+DROP TABLE standing CASCADE;
+DROP TABLE outcome CASCADE;
+DROP TABLE game CASCADE;
+DROP TABLE player CASCADE;
+DROP TABLE tournament CASCADE;
 
 -- CREATE TABLES
 -- tournament table
@@ -47,7 +47,7 @@ loser_player_id INTEGER NOT NULL REFERENCES player(player_id)
 CREATE TABLE standing(
 player_id INTEGER NOT NULL REFERENCES player ON DELETE CASCADE,
 player_win_count INTEGER NOT NULL DEFAULT 0,
-player_matches_count INTEGER NOT NULL DEFAULT 0
+player_game_count INTEGER NOT NULL DEFAULT 0
 );
 
 
@@ -68,10 +68,10 @@ BEGIN
     IF (TG_OP = 'INSERT') THEN
         UPDATE standing
             SET player_win_count = player_win_count + 1,
-            player_matches_count = player_matches_count + 1
+                player_game_count = player_game_count + 1
         WHERE player_id = NEW.winner_player_id;
         UPDATE standing
-            SET player_matches_count = player_matches_count + 1
+            SET player_game_count = player_game_count + 1
         WHERE player_id = NEW.loser_player_id;
         RETURN NEW;
     END IF;
@@ -95,7 +95,7 @@ FOR EACH ROW EXECUTE PROCEDURE func_update_standing();
 -- CREATE VIEWS
 -- vw_player_details
 CREATE OR REPLACE VIEW vw_player_details AS
-SELECT t.tournament_id, t.tournament_name, p.player_id, p.player_name, s.player_win_count
+SELECT t.tournament_id, t.tournament_name, p.player_id, p.player_name, s.player_win_count, s.player_game_count
 FROM tournament t
 JOIN player p ON
 t.tournament_id = p.tournament_id
