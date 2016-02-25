@@ -129,19 +129,24 @@ def testPairings():
     """
     Test that pairings are generated properly both before and after match reporting.
     """
+    deleteStanding()
+    deleteOutcome()
     deleteMatches()
     deletePlayers()
-    registerPlayer("Twilight Sparkle")
-    registerPlayer("Fluttershy")
-    registerPlayer("Applejack")
-    registerPlayer("Pinkie Pie")
-    registerPlayer("Rarity")
-    registerPlayer("Rainbow Dash")
-    registerPlayer("Princess Celestia")
-    registerPlayer("Princess Luna")
-    standings = playerStandings()
+    deleteTournaments()
+    tournament_name = "Baseball Tournament"
+    createTournament(tournament_name)
+    registerPlayer(tournament_name, "Twilight Sparkle")
+    registerPlayer(tournament_name, "Fluttershy")
+    registerPlayer(tournament_name, "Applejack")
+    registerPlayer(tournament_name, "Pinkie Pie")
+    registerPlayer(tournament_name, "Rarity")
+    registerPlayer(tournament_name, "Rainbow Dash")
+    registerPlayer(tournament_name, "Princess Celestia")
+    registerPlayer(tournament_name, "Princess Luna")
+    standings = playerStandings(tournament_name)
     [id1, id2, id3, id4, id5, id6, id7, id8] = [row[0] for row in standings]
-    pairings = swissPairings()
+    pairings = swissPairings(tournament_name)
     if len(pairings) != 4:
         raise ValueError(
             "For eight players, swissPairings should return 4 pairs. Got {pairs}".format(pairs=len(pairings)))
