@@ -15,8 +15,11 @@ def testCount():
              player count after 1 and 2 players registered,
              player count after players deleted.
     """
+    deleteStanding()
+    deleteOutcome()
     deleteMatches()
     deletePlayers()
+    deleteTournaments()
     c = countPlayers()
     if c == '0':
         raise TypeError(
@@ -24,13 +27,15 @@ def testCount():
     if c != 0:
         raise ValueError("After deletion, countPlayers should return zero.")
     print "1. countPlayers() returns 0 after initial deletePlayers() execution."
-    registerPlayer("Chandra Nalaar")
+    tournament_name = "Chess Knockout Tournament"
+    createTournament(tournament_name)
+    registerPlayer(tournament_name, "Chandra Nalaar")
     c = countPlayers()
     if c != 1:
         raise ValueError(
             "After one player registers, countPlayers() should be 1. Got {c}".format(c=c))
     print "2. countPlayers() returns 1 after one player is registered."
-    registerPlayer("Jace Beleren")
+    registerPlayer(tournament_name, "Jace Beleren")
     c = countPlayers()
     if c != 2:
         raise ValueError(
@@ -49,11 +54,16 @@ def testStandingsBeforeMatches():
     Test to ensure players are properly represented in standings prior
     to any matches being reported.
     """
+    deleteStanding()
+    deleteOutcome()
     deleteMatches()
     deletePlayers()
-    registerPlayer("Melpomene Murray")
-    registerPlayer("Randy Schwartz")
-    standings = playerStandings()
+    deleteTournaments()
+    tournament_name = "Cricket Tournament"
+    createTournament(tournament_name)
+    registerPlayer(tournament_name, "Melpomene Murray")
+    registerPlayer(tournament_name, "Randy Schwartz")
+    standings = playerStandings(tournament_name)
     if len(standings) < 2:
         raise ValueError("Players should appear in playerStandings even before "
                          "they have played any matches.")
@@ -76,17 +86,24 @@ def testReportMatches():
     Test that matches are reported properly.
     Test to confirm matches are deleted properly.
     """
+    deleteStanding()
+    deleteOutcome()
     deleteMatches()
     deletePlayers()
-    registerPlayer("Bruno Walton")
-    registerPlayer("Boots O'Neal")
-    registerPlayer("Cathy Burton")
-    registerPlayer("Diane Grant")
-    standings = playerStandings()
+    deleteTournaments()
+    tournament_name = "Baseball Tournament"
+    createTournament(tournament_name)
+    registerPlayer(tournament_name, "Bruno Walton")
+    registerPlayer(tournament_name, "Boots O'Neal")
+    registerPlayer(tournament_name, "Cathy Burton")
+    registerPlayer(tournament_name, "Diane Grant")
+    standings = playerStandings(tournament_name)
     [id1, id2, id3, id4] = [row[0] for row in standings]
-    reportMatch(id1, id2)
-    reportMatch(id3, id4)
-    standings = playerStandings()
+    createMatchesByPlayerIDs(id1, id2)
+    createMatchesByPlayerIDs(id3, id4)
+    reportMatchByPlayerIDs(id1, id2)
+    reportMatchByPlayerIDs(id3, id4)
+    standings = playerStandings(tournament_name)
     for (i, n, w, m) in standings:
         if m != 1:
             raise ValueError("Each player should have one match recorded.")
@@ -95,8 +112,9 @@ def testReportMatches():
         elif i in (id2, id4) and w != 0:
             raise ValueError("Each match loser should have zero wins recorded.")
     print "7. After a match, players have updated standings."
+    deleteOutcome()
     deleteMatches()
-    standings = playerStandings()
+    standings = playerStandings(tournament_name)
     if len(standings) != 4:
         raise ValueError("Match deletion should not change number of players in standings.")
     for (i, n, w, m) in standings:
@@ -111,26 +129,31 @@ def testPairings():
     """
     Test that pairings are generated properly both before and after match reporting.
     """
+    deleteStanding()
+    deleteOutcome()
     deleteMatches()
     deletePlayers()
-    registerPlayer("Twilight Sparkle")
-    registerPlayer("Fluttershy")
-    registerPlayer("Applejack")
-    registerPlayer("Pinkie Pie")
-    registerPlayer("Rarity")
-    registerPlayer("Rainbow Dash")
-    registerPlayer("Princess Celestia")
-    registerPlayer("Princess Luna")
-    standings = playerStandings()
+    deleteTournaments()
+    tournament_name = "Baseball Tournament"
+    createTournament(tournament_name)
+    registerPlayer(tournament_name, "Twilight Sparkle")
+    registerPlayer(tournament_name, "Fluttershy")
+    registerPlayer(tournament_name, "Applejack")
+    registerPlayer(tournament_name, "Pinkie Pie")
+    registerPlayer(tournament_name, "Rarity")
+    registerPlayer(tournament_name, "Rainbow Dash")
+    registerPlayer(tournament_name, "Princess Celestia")
+    registerPlayer(tournament_name, "Princess Luna")
+    standings = playerStandings(tournament_name)
     [id1, id2, id3, id4, id5, id6, id7, id8] = [row[0] for row in standings]
-    pairings = swissPairings()
+    pairings = swissPairings(tournament_name)
     if len(pairings) != 4:
         raise ValueError(
             "For eight players, swissPairings should return 4 pairs. Got {pairs}".format(pairs=len(pairings)))
-    reportMatch(id1, id2)
-    reportMatch(id3, id4)
-    reportMatch(id5, id6)
-    reportMatch(id7, id8)
+    reportMatchByPlayerIDs(id1, id2)
+    reportMatchByPlayerIDs(id3, id4)
+    reportMatchByPlayerIDs(id5, id6)
+    reportMatchByPlayerIDs(id7, id8)
     pairings = swissPairings()
     if len(pairings) != 4:
         raise ValueError(
