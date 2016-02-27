@@ -18,6 +18,9 @@ def test():
     registerPlayer(baseball_tournament_name, "William Hunt")
     registerPlayer(baseball_tournament_name, "Daniel D")
     registerPlayer(baseball_tournament_name, "Jessica Jones")
+
+    swissPairings(baseball_tournament_name)
+
     # create matches
     # rnd 1
     createMatchesByPlayerNames("Roger Rabbit", "Smith Jones")
@@ -28,6 +31,8 @@ def test():
     reportMatchByPlayerNames("John Smith", "William Hunt")
     createMatchesByPlayerNames("Daniel D", "Jessica Jones")
     reportMatchByPlayerNames("Daniel D", "Jessica Jones")
+
+    swissPairings(baseball_tournament_name)
 
     # rnd 2
     # winners from rnd 1
@@ -41,6 +46,8 @@ def test():
     createMatchesByPlayerNames("William Hunt", "Jessica Jones")
     reportMatchByPlayerNames("William Hunt", "Jessica Jones")
 
+    swissPairings(baseball_tournament_name)
+
     # rnd 3
     # winners from rnd 2
     createMatchesByPlayerNames("Roger Rabbit", "John Smith")
@@ -53,6 +60,29 @@ def test():
     createMatchesByPlayerNames("Dan North", "Jessica Jones")
     reportMatchByPlayerNames("Dan North", "Jessica Jones")
 
+    swissPairings(baseball_tournament_name)
+
+
+def testPair():
+    deleteOutcome()
+    deleteMatches()
+    deletePlayers()
+    deleteTournaments()
+    # create tournament
+    tournament_name = "tt tournament"
+    createTournament(tournament_name)
+    registerPlayer(tournament_name, "Twilight Sparkle")
+    registerPlayer(tournament_name, "Fluttershy")
+    registerPlayer(tournament_name, "Applejack")
+    registerPlayer(tournament_name, "Pinkie Pie")
+    registerPlayer(tournament_name, "Rarity")
+    registerPlayer(tournament_name, "Rainbow Dash")
+    registerPlayer(tournament_name, "Princess Celestia")
+    registerPlayer(tournament_name, "Princess Luna")
+
+    swissPairings(tournament_name)
+
 
 if __name__ == '__main__':
     test()
+    # testPair()

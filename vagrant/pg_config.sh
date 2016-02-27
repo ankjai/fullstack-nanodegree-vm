@@ -4,6 +4,7 @@ apt-get -qqy install postgresql python-psycopg2
 apt-get -qqy install python-flask python-sqlalchemy
 apt-get -qqy install python-pip
 pip install bleach
+pip install networkx
 pip install oauth2client
 pip install requests
 pip install httplib2

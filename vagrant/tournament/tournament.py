@@ -2,8 +2,10 @@
 # 
 # tournament.py -- implementation of a Swiss-system tournament
 #
+import random
 
 import bleach
+import networkx as nx
 import psycopg2
 
 
@@ -233,6 +235,22 @@ def reportMatch(game_id, winner_player_id, loser_player_id):
     exeSql(sql, {'game_id': game_id, 'winner_player_id': winner_player_id, 'loser_player_id': loser_player_id})
 
 
+def hasPlayedEarlier(first_player_id, second_player_id):
+    # create query
+    sql = "SELECT COUNT(*) " \
+          "FROM game " \
+          "WHERE (first_player_id=%(first_player_id)s AND second_player_id=%(second_player_id)s) " \
+          "OR (first_player_id=%(second_player_id)s AND second_player_id=%(first_player_id)s);"
+
+    # exe query
+    matchCount = exeSql(sql, {'first_player_id': first_player_id, 'second_player_id': second_player_id})
+
+    if int(matchCount[0][0]) == 0:
+        return False
+    else:
+        return True
+
+
 def swissPairings(tournament_name):
     """Returns a list of pairs of players for the next round of a match.
   
@@ -248,6 +266,71 @@ def swissPairings(tournament_name):
         id2: the second player's unique id
         name2: the second player's name
     """
+    # retrieve current player standing from DB
+    players_standing = playerStandings(tournament_name)
+
+    # group players by their standing (win_count)
+    players_group = groupPlayers(players_standing)
+
+    print players_group, len(players_group)
+
+    makePairs(players_group)
+
+
+def groupPlayers(players_standing):
+    # as we know players_standing is list of players in desc order
+    # i.e player w/ most winning is on the top
+    win_count = players_standing[0][2]
+
+    # group's list
+    list_ = []
+    # player's in same group list
+    inner_list = []
+
+    for player in players_standing:
+        # players of same standing
+        if win_count == player[2]:
+            inner_list.append(player)
+        # players of lower standing
+        elif win_count > player[2]:
+            list_.append(inner_list)
+            win_count = player[2]
+            inner_list = []
+            inner_list.append(player)
+
+    list_.append(inner_list)
+
+    return list_
+
+
+def makePairs(players_group):
+    pairs = []
+    # graph_ = nx.Graph()
+    # graph_.add_nodes_from(players_group)
+
+    for group in players_group:
+
+        graph_ = nx.Graph()
+        graph_.add_nodes_from(group)
+
+        length = len(group)
+
+        for idx, player in enumerate(group):
+            print "INFO: ", length, idx, player
+            while idx < (length - 1):
+                wgt = random.randint(1, length)
+                print "group", group[idx + 1], " idx", idx, "wgt", wgt
+                if hasPlayedEarlier(player[0], group[idx + 1][0]):
+                    print "PLAYED"
+                else:
+                    print "NOT PLAYED"
+                    graph_.add_edge(player, group[idx + 1], weight=wgt)
+                idx = idx + 1
+
+    pairing = nx.max_weight_matching(graph_)
+
+    print "PAIRING", pairing
+    return pairs
 
 
 def exeSql(sql, dict_):
