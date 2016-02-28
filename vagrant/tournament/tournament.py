@@ -272,9 +272,9 @@ def swissPairings(tournament_name):
     # group players by their standing (win_count)
     players_group = groupPlayers(players_standing)
 
-    print players_group, len(players_group)
+    # print players_group, len(players_group)
 
-    makePairs(players_group)
+    return makePairs(players_group)
 
 
 def groupPlayers(players_standing):
@@ -305,32 +305,54 @@ def groupPlayers(players_standing):
 
 def makePairs(players_group):
     pairs = []
-    # graph_ = nx.Graph()
-    # graph_.add_nodes_from(players_group)
+    graph_ = nx.Graph()
 
     for group in players_group:
 
-        graph_ = nx.Graph()
         graph_.add_nodes_from(group)
 
         length = len(group)
 
         for idx, player in enumerate(group):
-            print "INFO: ", length, idx, player
+            # print "INFO: ", length, idx, player
             while idx < (length - 1):
                 wgt = random.randint(1, length)
-                print "group", group[idx + 1], " idx", idx, "wgt", wgt
-                if hasPlayedEarlier(player[0], group[idx + 1][0]):
-                    print "PLAYED"
-                else:
-                    print "NOT PLAYED"
+                # print "group", group[idx + 1], " idx", idx, "wgt", wgt
+                if not hasPlayedEarlier(player[0], group[idx + 1][0]):
+                    # print "NOT PLAYED"
                     graph_.add_edge(player, group[idx + 1], weight=wgt)
                 idx = idx + 1
 
     pairing = nx.max_weight_matching(graph_)
+    temp_dict = {}
+    # print "PAIRING", pairing
 
-    print "PAIRING", pairing
-    return pairs
+    for key, value in pairing.iteritems():
+        # print key, " : ", value
+        if not temp_dict.has_key(key):
+            if not key in temp_dict.values():
+                temp_dict[key] = value
+
+    # print ">>>", temp_dict
+
+    pairs = temp_dict.items()
+
+    # print "===> ", len(pairs), pairs
+
+    swiss = []
+
+    for pair in pairs:
+        # print pair
+        tup_ = []
+        for pl_info in pair:
+            # print "XXXXX:", pl_info[0], pl_info[1]
+            tup_.append(pl_info[0])
+            tup_.append(pl_info[1])
+        swiss.append(tuple(tup_))
+
+    # print "swissPairing: ", swiss
+
+    return swiss
 
 
 def exeSql(sql, dict_):
