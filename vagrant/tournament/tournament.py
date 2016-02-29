@@ -283,76 +283,78 @@ def groupPlayers(players_standing):
     win_count = players_standing[0][2]
 
     # group's list
-    list_ = []
-    # player's in same group list
-    inner_list = []
+    group_list = []
 
+    # player's in same group list
+    grp_wise_player_list = []
+
+    # loop thru list to group players
+    # according to their standing
     for player in players_standing:
         # players of same standing
         if win_count == player[2]:
-            inner_list.append(player)
+            grp_wise_player_list.append(player)
         # players of lower standing
         elif win_count > player[2]:
-            list_.append(inner_list)
+            group_list.append(grp_wise_player_list)
             win_count = player[2]
-            inner_list = []
-            inner_list.append(player)
+            grp_wise_player_list = []
+            grp_wise_player_list.append(player)
 
-    list_.append(inner_list)
+    group_list.append(grp_wise_player_list)
 
-    return list_
+    return group_list
 
 
 def makePairs(players_group):
-    pairs = []
+    # create graph
     graph_ = nx.Graph()
 
     for group in players_group:
-
+        # add players to graph
         graph_.add_nodes_from(group)
 
+        # no. of players in each standing
         length = len(group)
 
         for idx, player in enumerate(group):
-            # print "INFO: ", length, idx, player
             while idx < (length - 1):
+                # weight players randomly to ensure pairing are not always same
                 wgt = random.randint(1, length)
-                # print "group", group[idx + 1], " idx", idx, "wgt", wgt
+                # connect nodes (players) only when they have not played
+                # against each other
                 if not hasPlayedEarlier(player[0], group[idx + 1][0]):
-                    # print "NOT PLAYED"
                     graph_.add_edge(player, group[idx + 1], weight=wgt)
                 idx = idx + 1
 
-    pairing = nx.max_weight_matching(graph_)
-    temp_dict = {}
-    # print "PAIRING", pairing
+    # get dict of paired palyers
+    pair_dict = nx.max_weight_matching(graph_)
 
-    for key, value in pairing.iteritems():
-        # print key, " : ", value
-        if not temp_dict.has_key(key):
-            if not key in temp_dict.values():
-                temp_dict[key] = value
+    # temp dict to store unique pairings
+    temp_pair_dict = {}
 
-    # print ">>>", temp_dict
+    for key, value in pair_dict.iteritems():
+        if not temp_pair_dict.has_key(key):
+            if not key in temp_pair_dict.values():
+                temp_pair_dict[key] = value
 
-    pairs = temp_dict.items()
+    # convert dict to list
+    pair_list_frm_dict = temp_pair_dict.items()
 
-    # print "===> ", len(pairs), pairs
+    # final list which will carry
+    # tuples of paired players
+    swiss_pairs = []
 
-    swiss = []
-
-    for pair in pairs:
-        # print pair
-        tup_ = []
+    for pair in pair_list_frm_dict:
+        temp_list_of_pairs = []
         for pl_info in pair:
-            # print "XXXXX:", pl_info[0], pl_info[1]
-            tup_.append(pl_info[0])
-            tup_.append(pl_info[1])
-        swiss.append(tuple(tup_))
+            temp_list_of_pairs.append(pl_info[0])
+            temp_list_of_pairs.append(pl_info[1])
+        # convert list of pair to tuple and add
+        # it to final list
+        swiss_pairs.append(tuple(temp_list_of_pairs))
 
-    # print "swissPairing: ", swiss
-
-    return swiss
+    return swiss_pairs
 
 
 def exeSql(sql, dict_):
