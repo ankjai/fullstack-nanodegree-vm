@@ -6,12 +6,13 @@
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
 
--- cleanUp
-DROP TABLE standing CASCADE;
-DROP TABLE outcome CASCADE;
-DROP TABLE game CASCADE;
-DROP TABLE player CASCADE;
-DROP TABLE tournament CASCADE;
+-- cleanUp; enable lines below if you want to recreate
+-- tables/views
+--DROP TABLE standing CASCADE;
+--DROP TABLE outcome CASCADE;
+--DROP TABLE game CASCADE;
+--DROP TABLE player CASCADE;
+--DROP TABLE tournament CASCADE;
 
 -- CREATE TABLES
 -- tournament table
@@ -123,6 +124,8 @@ JOIN standing s ON
 p.player_id = s.player_id;
 
 -- vw_game_details
+-- though view not used in current use cases, can be used if we want to enhance functionality or
+-- add additional game related use cases
 CREATE OR REPLACE VIEW vw_game_details AS
 SELECT t.tournament_id, t.tournament_name, g.game_id, g.first_player_id, g.second_player_id, o.game_draw, o.winner_player_id, o.loser_player_id
 FROM tournament t

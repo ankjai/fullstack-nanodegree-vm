@@ -99,10 +99,10 @@ def testReportMatches():
     registerPlayer(tournament_name, "Diane Grant")
     standings = playerStandings(tournament_name)
     [id1, id2, id3, id4] = [row[0] for row in standings]
-    createMatchesByPlayerIDs(id1, id2)
-    createMatchesByPlayerIDs(id3, id4)
-    reportMatchByPlayerIDs(id1, id2)
-    reportMatchByPlayerIDs(id3, id4)
+    createMatches(id1, id2)
+    createMatches(id3, id4)
+    reportMatch(id1, id2)
+    reportMatch(id3, id4)
     standings = playerStandings(tournament_name)
     for (i, n, w, m) in standings:
         if m != 1:
@@ -150,14 +150,14 @@ def testPairings():
     if len(pairings) != 4:
         raise ValueError(
             "For eight players, swissPairings should return 4 pairs. Got {pairs}".format(pairs=len(pairings)))
-    createMatchesByPlayerIDs(id1, id2)
-    createMatchesByPlayerIDs(id3, id4)
-    createMatchesByPlayerIDs(id5, id6)
-    createMatchesByPlayerIDs(id7, id8)
-    reportMatchByPlayerIDs(id1, id2)
-    reportMatchByPlayerIDs(id3, id4)
-    reportMatchByPlayerIDs(id5, id6)
-    reportMatchByPlayerIDs(id7, id8)
+    createMatches(id1, id2)
+    createMatches(id3, id4)
+    createMatches(id5, id6)
+    createMatches(id7, id8)
+    reportMatch(id1, id2)
+    reportMatch(id3, id4)
+    reportMatch(id5, id6)
+    reportMatch(id7, id8)
     pairings = swissPairings(tournament_name)
     if len(pairings) != 4:
         raise ValueError(
