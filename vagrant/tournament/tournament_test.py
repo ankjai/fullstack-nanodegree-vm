@@ -147,9 +147,10 @@ def testPairings():
     standings = playerStandings(tournament_name)
     [id1, id2, id3, id4, id5, id6, id7, id8] = [row[0] for row in standings]
     pairings = swissPairings(tournament_name)
-    if len(pairings) != 4:
-        raise ValueError(
-            "For eight players, swissPairings should return 4 pairs. Got {pairs}".format(pairs=len(pairings)))
+
+    # check length of pairings list
+    _chkPairLength(pairings)
+
     createMatches(id1, id2)
     createMatches(id3, id4)
     createMatches(id5, id6)
@@ -159,9 +160,115 @@ def testPairings():
     reportMatch(id5, id6)
     reportMatch(id7, id8)
     pairings = swissPairings(tournament_name)
+
+    # check length of pairings list
+    _chkPairLength(pairings)
+
+    # check for valid pairs
+    _chkValidPairs(standings, pairings)
+
+    print "10. After one match, players with one win are properly paired."
+
+
+def testMultiTournament():
+    deleteStanding()
+    deleteOutcome()
+    deleteMatches()
+    deletePlayers()
+    deleteTournaments()
+    chess_tournament = "Chess Tournament"
+    createTournament(chess_tournament)
+    cricket_tournament = "Cricket Tournament"
+    createTournament(cricket_tournament)
+    # create chess players
+    registerPlayer(chess_tournament, "Roger Rabbit")
+    registerPlayer(chess_tournament, "Smith Jones")
+    registerPlayer(chess_tournament, "Jon Doe")
+    registerPlayer(chess_tournament, "Dan North")
+    registerPlayer(chess_tournament, "John Smith")
+    registerPlayer(chess_tournament, "William Hunt")
+    registerPlayer(chess_tournament, "Daniel D")
+    registerPlayer(chess_tournament, "Jessica Jones")
+    # create cricket players
+    registerPlayer(cricket_tournament, "Stacey Mckinney")
+    registerPlayer(cricket_tournament, "Tommie Obrien")
+    registerPlayer(cricket_tournament, "Wade Patterson")
+    registerPlayer(cricket_tournament, "Dale Reed")
+    registerPlayer(cricket_tournament, "Freddie Tran")
+    registerPlayer(cricket_tournament, "Darrell Lucas")
+    registerPlayer(cricket_tournament, "Jennifer Hoffman")
+    registerPlayer(cricket_tournament, "Gwendolyn Scott")
+
+    # chess tournament
+    chess_standings = playerStandings(chess_tournament)
+    [id1, id2, id3, id4, id5, id6, id7, id8] = [row[0] for row in chess_standings]
+
+    # get chess swiss pairing
+    chess_pairings = swissPairings(chess_tournament)
+
+    # check length of chess pairings list
+    _chkPairLength(chess_pairings)
+
+    # create and report match result for chess tournament
+    createMatches(id1, id2)
+    createMatches(id3, id4)
+    createMatches(id5, id6)
+    createMatches(id7, id8)
+    reportMatch(id1, id2)
+    reportMatch(id3, id4)
+    reportMatch(id5, id6)
+    reportMatch(id7, id8)
+
+    # cricket tournament
+    cricket_standings = playerStandings(cricket_tournament)
+    [id1, id2, id3, id4, id5, id6, id7, id8] = [row[0] for row in cricket_standings]
+
+    # get cricket swiss pairing
+    cricket_pairings = swissPairings(cricket_tournament)
+
+    # check length of cricket pairings list
+    _chkPairLength(cricket_pairings)
+
+    # create and report match result for cricket tournament
+    createMatches(id1, id2)
+    createMatches(id3, id4)
+    createMatches(id5, id6)
+    createMatches(id7, id8)
+    reportMatch(id1, id2)
+    reportMatch(id3, id4)
+    reportMatch(id5, id6)
+    reportMatch(id7, id8)
+
+    # get swissPairing of chess tournament after 1st rnd
+    chess_pairings = swissPairings(chess_tournament)
+
+    # check length of pairings list
+    _chkPairLength(chess_pairings)
+
+    # check for valid pairs
+    _chkValidPairs(chess_standings, chess_pairings)
+
+    # get swissPairing of cricket tournament after 1st rnd
+    cricket_pairings = swissPairings(cricket_tournament)
+
+    # check length of pairings list
+    _chkPairLength(cricket_pairings)
+
+    # check for valid pairs
+    _chkValidPairs(cricket_standings, cricket_pairings)
+
+    print "11. In both the tournaments after 1st round, players with one win are properly paired."
+
+
+def _chkPairLength(pairings):
     if len(pairings) != 4:
         raise ValueError(
             "For eight players, swissPairings should return 4 pairs. Got {pairs}".format(pairs=len(pairings)))
+
+
+def _chkValidPairs(standings, pairings):
+    [id1, id2, id3, id4, id5, id6, id7, id8] = [row[0] for row in standings]
+
     [(pid1, pname1, pid2, pname2), (pid3, pname3, pid4, pname4), (pid5, pname5, pid6, pname6),
      (pid7, pname7, pid8, pname8)] = pairings
     possible_pairs = set([frozenset([id1, id3]), frozenset([id1, id5]),
@@ -177,7 +284,6 @@ def testPairings():
         if pair not in possible_pairs:
             raise ValueError(
                 "After one match, players with one win should be paired.")
-    print "10. After one match, players with one win are properly paired."
 
 
 if __name__ == '__main__':
@@ -185,4 +291,5 @@ if __name__ == '__main__':
     testStandingsBeforeMatches()
     testReportMatches()
     testPairings()
+    testMultiTournament()
     print "Success!  All tests pass!"
