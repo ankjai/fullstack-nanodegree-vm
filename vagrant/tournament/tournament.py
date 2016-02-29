@@ -20,7 +20,7 @@ def deleteTournaments():
     sql = "DELETE FROM tournament;"
 
     # execute sql
-    exeSql(sql, None)
+    _exeSql(sql, None)
 
 
 def deleteMatches():
@@ -29,7 +29,7 @@ def deleteMatches():
     sql = "DELETE FROM game;"
 
     # execute sql
-    exeSql(sql, None)
+    _exeSql(sql, None)
 
 
 def deletePlayers():
@@ -38,7 +38,7 @@ def deletePlayers():
     sql = "DELETE FROM player;"
 
     # execute sql
-    exeSql(sql, None)
+    _exeSql(sql, None)
 
 
 def deleteOutcome():
@@ -46,7 +46,7 @@ def deleteOutcome():
     sql = "DELETE FROM outcome;"
 
     # execute sql
-    exeSql(sql, None)
+    _exeSql(sql, None)
 
 
 def deleteStanding():
@@ -54,7 +54,7 @@ def deleteStanding():
     sql = "DELETE FROM standing;"
 
     # execute sql
-    exeSql(sql, None)
+    _exeSql(sql, None)
 
 
 def countPlayers():
@@ -62,7 +62,7 @@ def countPlayers():
     # sql statement
     sql = "SELECT COUNT(*) FROM player;"
 
-    return int(exeSql(sql, None)[0][0])
+    return int(_exeSql(sql, None)[0][0])
 
 
 def createTournament(tournament_name):
@@ -82,7 +82,7 @@ def createTournament(tournament_name):
     tournament_name = bleach.clean(tournament_name)
 
     # execute sql
-    exeSql(sql, {'tournament_name': tournament_name})
+    _exeSql(sql, {'tournament_name': tournament_name})
 
 
 def registerPlayer(tournament_name, player_name):
@@ -100,7 +100,7 @@ def registerPlayer(tournament_name, player_name):
     tournament_name = bleach.clean(tournament_name)
 
     # execute sql to get tournament_id
-    tournament_id = int(exeSql(sql, {'tournament_name': tournament_name})[0][0])
+    tournament_id = int(_exeSql(sql, {'tournament_name': tournament_name})[0][0])
 
     # use bleach to
     # escapes or strips markup and attributes
@@ -110,7 +110,7 @@ def registerPlayer(tournament_name, player_name):
     sql = "INSERT INTO player(tournament_id, player_name) VALUES(%(tournament_id)s, %(player_name)s);"
 
     # execute sql
-    exeSql(sql, {'tournament_id': tournament_id, 'player_name': player_name})
+    _exeSql(sql, {'tournament_id': tournament_id, 'player_name': player_name})
 
 
 def playerStandings(tournament_name):
@@ -132,7 +132,7 @@ def playerStandings(tournament_name):
           "WHERE tournament_name=%(tournament_name)s " \
           "ORDER BY player_win_count DESC;"
 
-    return exeSql(sql, {'tournament_name': tournament_name})
+    return _exeSql(sql, {'tournament_name': tournament_name})
 
 
 def createMatches(first_player_id, second_player_id):
@@ -149,10 +149,10 @@ def createMatches(first_player_id, second_player_id):
           "WHERE player_id=%(player_id)s;"
 
     # exe for first player
-    [(first_player_tournament_id)] = exeSql(sql, {'player_id': first_player_id})
+    [(first_player_tournament_id)] = _exeSql(sql, {'player_id': first_player_id})
 
     # exe for second player
-    [(second_player_tournament_id)] = exeSql(sql, {'player_id': second_player_id})
+    [(second_player_tournament_id)] = _exeSql(sql, {'player_id': second_player_id})
 
     # create query
     sql = "INSERT INTO game(tournament_id, first_player_id, second_player_id) " \
@@ -161,7 +161,7 @@ def createMatches(first_player_id, second_player_id):
     # verify players belong to same tournament
     if first_player_tournament_id == second_player_tournament_id:
         # exe query
-        exeSql(sql, {'tournament_id': first_player_tournament_id, 'first_player_id': first_player_id,
+        _exeSql(sql, {'tournament_id': first_player_tournament_id, 'first_player_id': first_player_id,
                      'second_player_id': second_player_id})
     else:
         raise AssertionError("Players are not of same tournament.")
@@ -178,10 +178,10 @@ def reportMatch(winner_id, loser_id):
     sql = "SELECT tournament_id FROM player WHERE player_id = %(player_id)s;"
 
     # exe for winner
-    [(winner_tournament_id)] = exeSql(sql, {'player_id': winner_id})
+    [(winner_tournament_id)] = _exeSql(sql, {'player_id': winner_id})
 
     # exe for loser
-    [(loser_tournament_id)] = exeSql(sql, {'player_id': loser_id})
+    [(loser_tournament_id)] = _exeSql(sql, {'player_id': loser_id})
 
     # create query
     sql = "SELECT game_id " \
@@ -190,7 +190,7 @@ def reportMatch(winner_id, loser_id):
           "OR (first_player_id=%(loser_id)s AND second_player_id=%(winner_id)s);"
 
     # exe for game_id
-    [(game_id,)] = exeSql(sql, {'winner_id': winner_id, 'loser_id': loser_id})
+    [(game_id,)] = _exeSql(sql, {'winner_id': winner_id, 'loser_id': loser_id})
 
     # create query
     sql = "INSERT INTO outcome(game_id, winner_player_id, loser_player_id) " \
@@ -199,7 +199,7 @@ def reportMatch(winner_id, loser_id):
     # verify players are of same tournament
     if winner_tournament_id == loser_tournament_id:
         # exe query
-        exeSql(sql, {'game_id': game_id, 'winner_player_id': winner_id, 'loser_player_id': loser_id})
+        _exeSql(sql, {'game_id': game_id, 'winner_player_id': winner_id, 'loser_player_id': loser_id})
     else:
         raise AssertionError("Players are not of same tournament.")
 
@@ -212,7 +212,7 @@ def hasPlayedEarlier(first_player_id, second_player_id):
           "OR (first_player_id=%(second_player_id)s AND second_player_id=%(first_player_id)s);"
 
     # exe query
-    matchCount = exeSql(sql, {'first_player_id': first_player_id, 'second_player_id': second_player_id})
+    matchCount = _exeSql(sql, {'first_player_id': first_player_id, 'second_player_id': second_player_id})
 
     if int(matchCount[0][0]) == 0:
         return False
@@ -239,14 +239,14 @@ def swissPairings(tournament_name):
     players_standing = playerStandings(tournament_name)
 
     # group players by their standing (win_count)
-    players_group = groupPlayers(players_standing)
+    players_group = _groupPlayers(players_standing)
 
     # print players_group, len(players_group)
 
-    return makePairs(players_group)
+    return _makePairs(players_group)
 
 
-def groupPlayers(players_standing):
+def _groupPlayers(players_standing):
     """
     Private method to be used by swissPairings() to group players based on their standings.
     Args:
@@ -283,7 +283,7 @@ def groupPlayers(players_standing):
     return group_list
 
 
-def makePairs(players_group):
+def _makePairs(players_group):
     """
     Private method to be used by swissPairing() to pair players according to their
     standings.
@@ -349,7 +349,7 @@ def makePairs(players_group):
     return swiss_pairs
 
 
-def exeSql(sql, dict_):
+def _exeSql(sql, dict_):
     """
     Private method to be used by methods of this class to exe sql query.
     Args:
