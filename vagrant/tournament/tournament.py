@@ -288,7 +288,7 @@ def _makePairs(players_group):
     Private method to be used by swissPairing() to pair players according to their
     standings.
     The algorithm uses graph data structure and 'blossom algorithm' to fix game between players
-    of similiar standings.
+    of similar standings.
     Args:
         players_group: list of players grouped according to their standings.
 
